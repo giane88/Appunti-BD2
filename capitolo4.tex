@@ -1,0 +1,61 @@
+\label{capitolo4}
+\section{Basi di dati attive}
+Una base di dati si dice \emph{attiva} quando dispone di un sottoinsieme integrato per definire e gestire regole di produzione dette anche \emph{trigger}. Queste regole seguono il paradigma \emph{Evento-Condizione-Azione} ovvero ciascuna regola reagisce ad un evento specifico, valuta una condizione e in base alla veridicità di tale condizione esegue un'azione.\\
+L'esecuzione di queste regole avviene in un sotto-sistema autonomo detto \emph{processore delle regole} che tiene traccia degli eventi ed esegue le regole in base a politiche interne. il sistema così creato si dice \emph{reattivo} in quanto ad ogni azione da parte del client risponde una reazione.\\
+Le regole attive normalmente servono per gestire i vincoli di integrità, calcolare dati derivati o gestire eccezioni.
+\subsection{Caratteristiche generali dei trigger}
+La creazione di trigger fa parte del \emph{Data Definition Language} (DDL); i trigger possono essere in alcuni casi attivati disattivati dinamicamente.
+I trigger rispettano il paradigma \emph{Evento-Condizione-Azione} (ECA):
+\begin{itemize}
+\item gli eventi sono primitive per la manipolazione dei dati secondo il modello SQL (\textsf{insert, delete, update});
+\item la condizione (che è opzionale) è un predicato booleano espresso in SQL;
+\item l'azione è una sequenza di azioni SQL generiche arricchite talvolta da un linguaggio di programmazione integrato.
+\end{itemize}
+In genere i trigger fanno riferimento ad una tabella detta \emph{target} in quanto rispondono ad eventi relativi a tale tabella.\\
+Il comportamento del trigger può essere così descritto; quando un trigger è \emph{attivato} da uno dei suoi eventi viene \emph{valutato} durante la verifica della sua condizione e viene \emph{eseguito} quando viene posta in esecuzione la parte azione.\\
+Nei trigger esistono due tipi di granularità, una di tupla (\emph{row-level}) e di primitiva (\emph{statement-level}). Inoltre i trigger presentano due modalità una \emph{immediata} e l'altra \emph{differita}; nel caso di modalità immediata la loro valutazione avviene immediatamente dopo l'evento che li ha attivati (opzione \emph{after}) qualche volta il trigger precede l'evento a cui si riferisce (opzione \emph{before}). Nel caso di modalità differita i trigger vengono attivati dall'invocazione della \textsf{commit work}.\\
+E\' possibile far attivare i trigger uno con l'altro in questo caso si dice che sono in \emph{cascata}
+\subsection{Definizione e uso dei trigger in SQL-3}
+\subsubsection{Sintassi dei trigger}
+Ogni trigger è attivato da un qualunque evento che può essere una qualunque primitiva di modifica dei dati in SQL. La sintassi dell'istruzione di creazione di un trigger è la seguente:
+\begin{flushleft}
+\hspace{4cm}\textsf{create trigger} \emph{NomeTrigger}\\
+\hspace{4cm}\hspace{0,5cm}\emph{Modo Evento} \textsf{on} \emph{TabellaTarget}\\
+\hspace{4cm}\hspace{0,5cm}[\textsf{referencing} \emph{Referenza}]\\
+\hspace{4cm}\hspace{0,5cm}[\textsf{for each} \emph{Livello}]\\
+\hspace{4cm}\hspace{0,5cm}[\textsf{when} (\emph{PredicatoSQL})]\\
+\hspace{4cm}\hspace{0,5cm}\emph{StatementProceduraleSQL}\\
+\end{flushleft}
+Dove il \emph{Modo} è \textsf{before} o \textsf{after} l'\emph{Evento} è \textsf{insert, delete} oppure \textsf{update}, il \emph{Livello} è \textsf{row} (tupla) oppure \textsf{statement}(primitiva) La clausa opzionale \emph{Referenza} consente di rinominare le variabili. Infine lo statement procedurale SQL comprende uno o più comandi SQL; nel caso in cui i comandi siano più di uno devono essere inclusi nelle parole chiave \textsf{begin atomic} ed \textsf{end}.
+\subsubsection{Comportamento dei trigger}
+Il sistema che esegue le transizioni e le regole attive opera in un contesto transizionale atomico ovvero nel caso in cui si abbia un fallimento o di rollback vengono annullati tutti gli effetti di quella istruzione e di tutte le regole attivate da essa.\\
+Partiamo dal caso \emph{before}; in questo caso il trigger può solo modificare i valori della variabile \textsf{new} ma non può contenere comandi che vadano a modificare lo stato della base di dati, come tali essi non possono attivare altri trigger.\\
+Più trigger possono essere attivati dallo stesso evento, essi vengono eseguiti in base ad un ordinamento gestito dal sistema; i trigger a livello di tupla eseguno l'azione iterativamente su tutte le tuple coinvolte prima che sia attivata una nuova regola.\\
+Nel caso di clausula \emph{after} bisogna prestare attenzione alla possibilità di attivazione ricorsiva dei trigger. Quando un trigger provoca l'attivazione di un altro trigger lo stato di esecuzione del chiamante viene salvato e il sistema reagisce in modo ricorsivo. Quando il trigger chiamato termina l'esecuzione del chiamante riprende da dove si era interrotta. Nel caso di errore tutte le azioni vengono disfatte e viene garantito un \emph{rollback parziale}.
+\subsection{Caratteristiche evolute delle regole attive}
+I sistemi commerciali più evoluti hanno diverse caratteristiche evolute che ne aumentano il potere espressivo:
+\begin{itemize}
+\item Per quanto concerne gli eventi essi possono includere eventi \emph{temporali} o \emph{applicativi} (attivati direttamente dall'utente).
+\item L'attivazione dei trigger può dipendere da generiche \emph{espressioni booleane di eventi}.
+\item Oltre alle clausule \textsf{before} e \textsf{after} esiste anche la clausula \textsf{instead of}; quando la condizione della della corrispondente regola è vera l'azione viene esegita \emph{al posto} evento.
+\item La valutazione e l'esecuzione delle regole può essere \emph{distaccata} ovvero può essere valutata ed eseguita all'interno di un'altra transizione.
+\item I conflitti fra regole attivate dallo stesso evento possono venire risolti da \emph{priorità esplicite}.
+\item Le regole possono essere organizzate in gruppi che posssono essere \emph{attivati} o \emph{disattivati} separatamente.
+\end{itemize}
+
+\subsection{Proprietà delle regole attive}
+La progettazione di una singola non è complicato ma comprendere il comportamento collettivo di tutte le regole attivate da un singolo evento è assai più complesso in quanto la loro interazione non è facilmente comprensibile.\\
+Per comprendere il comportamento complesso di gruppi di regole si chiede che tali regole rispettino alcune proprietà:
+\begin{itemize}
+\item Un insieme di regole garantisce la \emph{terminazione} quando  per ogni transizione che scatena l'esecuzione di una regola tale esecuzione delle regole producono uno stato finale.
+\item Un insieme di regole garantisce la \emph{confluenza} quando per ogni transizione che scatena l'esecuzione delle regole tale esecuzione termina producendo uno stato finale che non dipende dall'ordine di esecuzione delle regole.
+\item Un insieme di regole garantisce il \emph{determinismo delle osservazioni} quando per una transizione che scatena l'esecuzione delle regole quando tale esecuzione è confluente e le azoni visibili svolte dalle regole sono identiche e prodotte nello stesso ordine.
+\end{itemize}
+Il processo di \emph{analisi delle regole} consente di verificare a tempo di creazione che le proprietà appena appena citate valgono per uno specifico set di regole. In particolare lo strumento essenziale è il cosiddetto \emph{grafo di attivazione} che rappresenta le interazioni fra regole. Un esecuzione può non terminante solo se nel grafo sono presenti dei cicli, ma non necessariamente. Infatti, ci sono casi in cui pur essendo presenti dei cicli, se le regole sono scritte correttamente l'esecuzione ha termine.
+\subsection{Applicazioni delle basi di dati attive}
+Le regole attive rispondono a esigenze di diverso tipo; le più classiche sono \emph{interne} alla base di dati e sono la gestione dei vincoli di integrità, o il computo di dati derivati. Altre regole classificate come \emph{esterne} esprimono conoscenza del tipo applicativo che sfugge a schemi predefiniti.
+Queste regole vengono anche chiamate \emph{regole aziendali}.
+\subsubsection{Gestione dell'integrità referenziale}
+la gestione di un qualunque vincolo di integrità tramite regole attive richiede innanzitutto che il vincolo sia espresso sotto forma di predicato SQL.
+Il predicato corrisponderà alla parte di \emph{condizione} di una o più regole attive associate al vincolo. Successivamente bisogna individuare gli eventi che possono causare una violazione del vincolo creando così la parte \emph{evento};
+infine bisogna decidere l'azione da svolgere in caso di violazione, si potrà fare un rollback parziale o totale oppure svolgere un'\emph{azione compensatrice}.

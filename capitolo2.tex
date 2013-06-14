@@ -1,0 +1,198 @@
+\label{capitolo2}
+\section{Basi di dati distribuite}
+Fino ad ora abbiamo studiato i meccanismi delle transizioni trascurando i componenti fisici sui quali la base di dati risiede e quindi immaginando che essa sia unica.\\
+In quai la totalità dei casi invece le basi di dati sono \emph{distribuite} ovvero risiedono su diverse macchine collegate tra loro da una rete.\\
+L'architettura distribuita più semplice è quella \emph{client-server} dove una serie di client gestiscono l'interazione con l'utente e sono connesse a una serie di server.\\
+I problemi iniziano però nel caso in cui due o più server siano collegati tra loro e debbano effettuare delle transizioni distribuite. Le maggiori difficoltà in questo caso si hanno nel garantire le proprietà "acide" delle transizioni. Per gestire tali casi studieremo il protocollo più diffuso chiamato protocollo di \emph{commit a due fasi}.
+Dalla nascita del contesto distribuito le basi di dati hanno iniziato a distinguersi in due categorie:
+\begin{itemize}
+\item La prima finalizzata alla gestione dei dati in linea (real-time) denominata \emph{On-Line Transiction Processing, OLTP} nella quale le architetture sono dimensionate per gestire centinaia o migliaia di transizioni al secondo.
+\item La seconda categoria è finalizzata all'analisi dei dati o \emph{On-Line Analytical Processing, OLAP} realizzate attraverso le \emph{data warehouse}.
+\end{itemize}
+\subsection{Architettura client-server}
+Il paradigma client-server prevede due attori i processi \emph{client} che richiedono i servizi e i \emph{server} che forniscono i servizi. I client hanno lo scopo di interfacciarsi con l'utente e generano in modo autonomo "poche" richieste ad un server, perciò essi sono definiti processi attivi; i server invece rispondono a "molte" richieste da parte di diversi client perciò sono definiti processi \emph{reattivi}.\\
+I server sono molto spesso \emph{multi-thread} ovvero possono gestire più di una transizione per volta. Ciascuna unità che gestisce una transizione è chiamata \emph{thread}; le richieste in arrivo al server e i risultati vengono immagazzinati in code fino alla loro gestione; queste code sono rispettivamente la \emph{coda di ingresso} e la \emph{coda di uscita}. Esse sono gestite o dal server stesso o da un altro processo detto \emph{dispacher}.
+\subsection{Basi di dati distribuite}
+\subsubsection{Applicazioni delle basi di dati distribuite}
+La decisione di avere una basi delle basi di dati distribuite è nata in quanto nelle imprese si ha una divisione delle informazioni nei diversi settori dell'azienda. Inoltre i sistemi distribuiti hanno prevarso su quelli centralizzati in quanto più flessibili, più resistenti ai guasti e meno soggetti a degrado delle prestazioni.\\
+Una prima classificazione delle basi di dati distribuite considera il tipo di DBMS utilizzato, infatti se i diversi server utilizzano lo stesso DBMS si parla di una base di dati \emph{omogenea} altrimenti essa è \emph{eterogenea}.
+Inoltre una base di dati può utilizzare una \emph{rete locale LAN} oppura una \emph{rete geografica WAN}
+\subsubsection{Autonomia locale e cooperazione}
+Una base di dati distribuita garantisce comunque ai programmi applicativi esattamente lo stesso tipo di interazioni che si avrebbe con un sistema centralizzato. Ma un sistema distribuito non ha lo scopo di massimizzare l'interazione tra i server ma al contrario un progetto accurato di una base di dati distribuita dovrebbe garantire che la maggior parte delle applicazioni si svolga in modo autonomo su di un solo server in modo da non dover aumentare il tempo di esecuzione a causa della latenza dovuta all'interazione.
+\subsubsection{Frammentazione e allocazione dei dati}
+La frammentazione dei dati consente di organizzare gli stessi in modo tale da garantire una distribuzione efficente e ben organizzata; ma per essere tale questa tecnica deve essere pianificata a piori.\\
+Possiamo avere due tipi di frammentazione \emph{orizzontale} o \emph{verticale}:
+\begin{itemize}
+\item Nella \emph{frammentazione orizzontale} i frammenti $R_i$ sono insiemi di tuple con lo stesso schema di relazione di $R$; può essere interpretato come il risultato di una selezione applicata ad $R$.
+Esempio divido i dati dei dipendenti in due, quelli che hanno uno stipendio minore di 1000\EUR e quelli con stipendio maggiore.
+\item Nella  \emph{frammentazione verticale} i frammenti $R_i$ hanno uno schema ottenuto come sottoinsieme dello schema di $R$.
+\end{itemize}
+La frammentazione è corretta se e solo se sono rispettate le seguenti proprietà:
+\begin{itemize}
+\item \emph{completezza:} ogni dato della relazione R deve essere presente in qualche suo frammento. 
+\item  \emph{ricostruibilità:} la relazione deve essere interamente ricostruibile a partire dai suoi frammenti.
+\end{itemize}
+Lo \emph{schema di allocazione} contiene il mapping dei frammenti sui server che lo memorizzano consentendo il passaggio da una descrizione logica a una fisica.
+Tale mapping può essere:
+\begin{itemize}
+\item \emph{non ridondante} se un frammento è allocato esattamente su un server.
+\item \emph{ridondante} quando qualche frammento o relazine viene collocato su più server.
+\end{itemize}
+\subsubsection{Livelli di trasparenza}
+Esistono diversi livelli di trasparenza che permettono di scrivere applicazioni a diverso livello. I principali tipi di trasparenza sono tre: trasparenza di frammentazione, di allocazione, e di linguaggio; vi è in oltre la possibilità di una totale assenza di trasparenza.
+\begin{itemize}
+\item \emph{Trasparenza di frammentazione} a questo livello il programmatore non si preoccupa della framentazione della base di dati ma a questo livello viene trattata come se la base di dati fosse situata su un unica macchina.
+\item \emph{Trasparenza di allocazione} In questo caso il programmatore conosce il grado di frammentazione della base di dati ma non si preoccupa di dove essa sia situata .
+\item \emph{Trasparenza di linguaggio} Il programmatore conosce tutto sulla framentazione e l'allocazione della base di dati e quindi la singola interrogazione deve essere mirata al giusto frammento. L'unica cosa che viene ancora ignorata è il linguaggio di intterrogazione che è unico per tutti i frammenti e allocazioni; esso è indipendente dal DBMS.
+
+\end{itemize}
+\subsubsection{Classificazione delle transizioni}
+Un client collegato a un server con un certo DBMS può inviare ad esso transizioni \emph{locali} ovvero destinate a dati presenti nel server oppure transizioni \emph{non locali} destinate a dati situati su altri DBMS; queste transizioni possono essere distinte in categorie:
+\begin{description}
+\item [richieste remote] sono transizioni di sola lettura ed indirizzate ad un solo DBMS remoto
+\item [transizioni remote] sono transizioni costituite da un numero qualsiasi di comandi SQL e destinate a un solo DBMS.
+\item [transizioni distribuite] sono transizioni rivolte a un generico numero di DBMS ma in cui ogni comando SQL è rivolto a uno specifico DBMS
+\item [richieste distribuite] sono tranzizioni arbitrarie costituite da un numero arbitrario di operazioni SQL nelle quali ogni query può fare riferimento a dati distribuiti su diversi DBMS.
+\end{description}
+\subsection{Tecnologia delle basi di dati distribuite}
+La distribuzione dei dati non influisce sulle proprietà acide di consistenza e persistenza:
+\begin{itemize}
+\item \emph{consistenza} delle transizioni non dipende dalla distribuzione dei dati, i vincoli di integrità esprimono solo proprietà locali dei DBMS; questo è dovuto soprattutto per la mancanza di meccanismi che permettano di far riferimento a dati distribuiti.
+\item \emph{persistenza} non è un problema che dipende dalla distribuzione dei datiin quanto ogni DBMS garantisce la persistenza attraverso meccanismi di backup e dump locali.
+\end{itemize}
+\subsubsection{Ottimizzazione di interrogazioni distribuite}
+L'ottimizzazione delle interrogazioni è richiesta soltanto quando trattiamo le richieste distribuite in cui cioè dati distribuiti sono coinvolti nella stessa interrogazione.\\
+Il DBMS al quale viene sottoposta l'intterrogazione si occupa della cosiddetta \emph{ottimizzazione globale}, ovvero della decomposizione in sotto-interrogazioni rivolte ad uno specifico DBMS.\\
+Le operazioni che vengono svolte sono: scegliere l'ordine delle operazioni e il loro metodo di esecuzione, si definisce la strategia di esecuzione nel caso in cui gli operandi siano allocati su nodi distinti definendo anche una strategia per la trasmissione dei risultati, nel caso di dati ridondanti è necessario decidere a quale copia di dati accedere. Per aiutare in tale decisione si associa a ogni nodo foglia un costo che prevede il contributo di tre componenti:
+$$C_{total} = C_{I/O} \times n_{I/O} + C_{cpu} \times n_{cpu} + C_{tr} \times n_{tr}$$
+dove $n_{tr}$ e $C_{tr}$ misurano rispettivamente la quantità di dati trasmessi in rete e il loro costo unitario.
+\subsubsection{Controllo di concorrenza}
+In un sistema distribuite una transizione $t_i$ può essere formata da varie sotto-transizioni $t_{ij}$ dove il secondo indice indica il nodo sul quale la sotto transizione viene eseguita. Inoltre possiamo dimostrare come la serializzabilità locale non sia condizione necessaria e sufficiente a garantire la serializzabilità di due transizioni.
+\paragraph{Serializzabilità globale} La \emph{serializzabilità globale} di due transizioni distribuite richiede l'esistenza di un \emph{unico schedule seriale S} che coinvolga tutte le transizioni del sistema e che sia comune a tutti gli schedule locali $S_j$. Questo significa che la proiezione $S[j]$ di S contenente le sole azioni che S svolge sul nodo j sia uguale allo schedule locale $S_j$.\\
+Questo proprietà risulta immediata nel caso di uso di locking a due fasi o di timestamp.
+\begin{itemize}
+\item Se ciascuno scheduler su ogni nodo della base di dati distribuita usa il metodo 2PL strict e quindi svolge l'azione di commit in modo atomico, cioè quando tutte le risorse sui vari nodi sono bloccate gli schedule risultanti sono globalmente serializzabili.
+\item Se un insieme di sotto-transizioni distribuite acquisisce un unico timestamp e usa tale timestamp nelle richieste a tutti gli scheduler gli schedule risultanti sono globalmente serializzabili.
+\end{itemize}
+\paragraph{Metodo di Lamport per assegnare i timestamp} Per garantire il buon funzionamento del metodo di concorrenza basato su timestamp è necessario che la transizione distribuita riceva il timestamp relativo all'istante in cui si sincronizza con le altre transizioni; per questo si usa il \emph{metodo di Lamport} che riflette le relazioni di precedenza in un sistema distribuito.\\
+Un timestamp è caratterizzato da due gruppi di cifre il meno significativo indica il nodo mentre il più significativo il numero di eventi che accadono su ciascun nodo ricavato da un contatore locale che viene incrementato ad ogni evento.\\
+Inoltre i timestamp si sincronizzano ogni qualvolta che due nodi comunicano aggiornando in quanto il timestamp dell'evento di ricezione deve avere un timestamp successivo a quello di invio.
+\paragraph{Rilevazione distribuita dei deadlock} Quando i deadlock coinvolgono transizioni distribuite la loro rilevazione è più complessa  in quanto i deadlock possono essere dovuti a situazioni di attesa circolare che si verificano su due o più nodi. La soluzione più semplice e più diffusa è sicuramente quella dell'uso dei timeout.\\
+Esiste però un altro algoritmo abbastanza efficente che permette la rilevazione dei deadlock distribuiti. Questo è un algoritmo distribuito che viene attivato periodicamente dai vari DBMS. Quando è attivo esso analizza la situazione di attesa sul suo nodo e comunica con le altre istanze la sua \emph{sequenza di attesa}; per evitare che lo stesso deadlock venga rilevato da più transizioni il messaggio viene propagato solo al DBMS ove è attiva la sotto-transizione attesa e se ad esempio il nodo ricevente ha un id maggiore di quello che invia.\\
+L'algoritmo opera come segue:
+\begin{enumerate}
+\item I messaggi provenienti da altri DBMS vengono letti e l'informazione viene composta in un grafo di attesa locale e le transizioni remote in attesa vengono aggiunte al grafo locale.
+\item Viene svolta una ricerca locale di deadlock e situazioni di stallo vengono risolte da degli abort.
+\item Vengono computate le sequenze di attesa remote e inviate ai DBMS remoti in avanti.
+\end{enumerate}
+\subsubsection{Atomicità di transizioni distribuite}ew3
+Per garantire l'atomicità di una transizione distribuita è necessario che tutti i nodi che partecipano alla transizione raggiungano la stessa decisione di commit o abort è necessario perciò eseguire protocolli particolari detti \emph{protocolli di commit} che consentono a una transizione di raggiungere correttamente la sua transizione finale.\\
+Esistono tuttavia diverse cause di guasto che potrebbero portare a problemi. Un sistema distribuito è soggetto a \emph{cadute di nodo} o a \emph{perdita di messaggi} che lasciano un protocollo in situazione incerta. Per questo si usa un meccanismo di \emph{ACK} per rispondere ai messaggi primari ma comunque la perdita di un messaggio lascia gli interlocutori in una situazione incerta.\\
+Per ovviare a questi problemi i protocolli di commit pongono un tempo limite alla ricezione dei messaggi di "ack" trascorso il quale il protocollo procede applicando delle contromisure.\\
+Il guasto più grave però risulta essere il partizionamento della rete soprattutto nel caso in cui una transizione sia attiva in più sottoreti.
+\subsection{Protocollo di commit a due fasi}
+Il protocollo di commit a due fasi si svolge nel seguente modo: due server decidono di effettuare una transizione contattano un terzo server che raccoglie le loro volontà e in una seconda fase comunica loro la possibilità di portare a termine la transizione. In questo contesto i due o più server che vogliono eseguire la transizione sono detti \emph{resource manager} (RM), mentre il server che coordina le azioni è detto \emph{transiction manager} (TM). Per rendere il protocollo resistente ai guasti TM e RM scrivono nuovi record nei loro log.
+\subsubsection{Nuovi record nei log}
+Il TM scrive nel suo log i seguenti record:
+\begin{itemize}
+\item il record di \textsf{prepare} che contiene l'identità dei processi RM.
+\item il record \textsf{global commit} o \textsf{global abort} 
+\item il record di \textsf{complete} che è scritto alla conclusione del protocollo di commit a due fasi. 
+\end{itemize}
+Il processo RM invece oltre ai classici record scrive un record in più
+\begin{itemize}
+\item il record di \textsf{redy} che indica la irrevocabile disponibilità a partecipare al protocollo contribuendo a una decisione di commit; su tale record viene scritto anche l'identificativo del TM.
+\end{itemize}
+\subsubsection{Protocollo in assenza di guasti}
+In assenza di guasti il protocollo di commit a due fasi consiste in una rapida sequenza di scritture sul log e di scambio di messaggi tra RM e TM.\\
+La \emph{prima fase} del protocollo si svolge nel seguente modo:
+\begin{enumerate}
+\item Il TM scrive il record di \textsf{prepare} nel proprio log e invia un messaggio di prepare a tutti gli RM ed imposta infine un timeout che scatta se vi è un eccessivo ritardo di risposta da parte degli RM.
+\item Gli RM che sono in uno stato affidabile attendono il messaggio di prepare e quando il messaggio arriva scrivono il record \textsf{ready} e trasmettono il relativo messaggio al TM.
+\item Il TM colleziona i messaggi di risposta e se da tutti gli RM riceve un messaggio positivo allora scrive nel suo log un record di \textsf{global commit}.
+\end{enumerate}
+La \emph{seconda fase} si articola nel seguente modo:
+\begin{enumerate}
+\item Il TM trasmette a tutti la sua decisione globale ed imposta un timeout che scatterà in presenza di un eccessivo ritardo.
+\item Gli RM, che sono rimasti in attesa di uno decisione, appena arriva il messaggio scrivono il record di \textsf{commit} o \textsf{abort} sul loro log e inviano un messaggio di \emph{ack} al TM.
+\item Il TM colleziona i vari ack e appena arrivano tutti scrive nel suo log il record di \textsf{complete}.
+
+\end{enumerate}
+Notiamo che un assenza di comunicazione tra TM e RM durante la priam fase provoca un abort totale mentre nella seconda fase implica la ripetizione della stessa fino all'avvenuta ricezione di tutti gli ack.\\
+Negli RM lo stato di ready comporta un blocco delle risorse che viene rilasciato solo all'avvenuto ricevimento della decisione del TM. L'intervallo tra la scrittura del log di \textsf{ready} e quello di \textsf{commit} o \textsf{abort} è chiamato \emph{finestra di incertezza}.
+\subsubsection{Protocolli di ripristino}
+Affrontiamo ora le possibili cause di errore.
+\paragraph{Caduta di un partecipante} La caduta di un partecipante comporta la perdita dei contenuti del buffer e può lasciare la base di dati in uno stato inconsistente. Per ricostruire lo stato dei partecipanti si usa il file di log; il protocollo di \emph{ripresa a caldo} non cambia nel caso in cui la transizione sia distribuita:
+\begin{itemize}
+\item quando l'ultimo record scritto è un'azione o un \textsf{abort} allora le azioni vanno \emph{disfatte}
+\item quando l'ultimo record è un \textsf{commit} le azioni vanno \emph{rifatte}
+\end{itemize}
+L'unico caso critico aggiuntivo si ha nel caso in cui l'ultimo record scritto sia quello di \textsf{ready} in questo caso il partecipante è in dubbio.
+Durante la fase di ripristino si aggiunge un terzo insieme detto di READY nel quale vengono collezionati gli identificativi delle transizioni che si trovano in quello stato. In questo caso o il TM ripete la seconda fase del protocollo oppure l'RM richiede esplicitamente l'esito di queste transizioni.
+\paragraph{Caduta del coordinatore} La caduta del coordinatore può avvenire durante la trasmissione dei messaggi e comporta la loro eventuale perdita. Si può ricavare dal log lo stato di avanzamento del protocollo ma non lo stato di invio/ricezione dei messaggi. Possiamo individuare nel log tre diversi stati del TM.
+\begin{itemize}
+\item Quando l'ultimo record nel log è \textsf{prepare} il TM potrebbe aver posto alcuni RMin situazione di blocco; il TM in questo caso comunica un \textsf{global abort} oppure può ripetere la prima fase del protocollo per poter poi procedere ad un \textsf{global commit}.
+\item Quando l'ultimo record del log è una \textsf{global decision} alcuni RM potrebbero non aver ricevuto il messaggio e essere ancora in uno stato di blocco. In questo caso il TM reinvia a tutti la sua decisione
+\item Quando l'ultimo record è un \textsf{complete} la caduta del coordinatore non ha alcun effetto.
+\end{itemize}
+\paragraph{Perdita di messaggi e partizionamenti della rete}
+Analizziamo ora i rimanenti problemi di perdita di messaggi e partizzionamento della rete:
+\begin{itemize}
+\item le perdita del messaggio \textsf{prepare} o \textsf{ready} non sono distinguibili dal TM che prende la decisione di \textsf{global abort}
+\item la perdita di un messaggio di decisione e relativo ack comporta la ripetizione della seconda fase e il reinvio della decisione globale
+\item un \emph{partizionamento della rete} implica che la transizione andrà a buon fine se e solo se TM e tutti gli RM sono nella stessa sottorete.
+\end{itemize}
+\subsubsection{Ottimizzazioni del commit a due fasi}
+Esistono alcune ottimizzazioni del protocollo appena esposto che permettono di alleggerire e velocizzare il protocollo.
+\paragraph{Protocollo di abort presunto} Il protocollo di abort presunto si basa sulla regola:
+\begin{center}
+\emph{A ogni richiesta di remote recovery da parte di un partecipante in dubbio sulla cui transizione il TM non abbia informazioni viene restituita la decisione di} \textsf{abort}.
+\end{center}
+Con questo metodo i record \textsf{prepare} e \textsf{global abort} sono omessi e anche il record \textsf{complete} non è critico. Vengono scritti perciò solo i record di \textsf{ready, commit} e \textsf{global commit}.
+\paragraph{Ottimizzazione "sola lettura"} Nel caso in cui un RM durante la transizione abbia eseguito operazioni di sola lettura allora al messaggio di prepare risponde con un messaggio di \textsf{read-only} da questo punto questo RM esce dal protocollo e viene ignorato dal TM.
+\subsubsection{Altri protocolli di commit}
+\paragraph{Protocollo di commit a quattro fasi} In questo protocollo il processo TM viene replicato da un processo di \emph{backup} posto su un altro nodo. Ad ogni fase del protocollo il TM prima informa il backup delle sue decisioni e poi comunica con gli RM.
+Quando il TM ha un guasto subentra il backup che attiva un altro backup e poi prosegue con il protocollo.
+\paragraph{Protocollo di commit a tre fasi} Il protocollo di commit a tre fasi consiste in una terza fase situata dopo il prepare nella quale il TM dopo aver ricevuto risposta positiva da tutti gli RM registra uno stato di \emph{pre-commit} e lo invia agli RM che inviano nuovamente risposta positiva e poi si ha l'ultima fase di commit vero e proprio.\\
+Questo meccanismo permette l'elezione di un nuovo TM in caso di caduta; se il nuovo TM trova nel suo log un record di \textsf{ready} allora impone un \textsf{global abort} se invece l'ultimo record è un \textsf{pre-commit} allora esso può imporre un \textsf{global commit}.\\
+Il problema di questo meccanismo è che allunga la finestra di incertezza e rende più probabile la condizione di blocco.
+\paragraph{Paxos Commit} L'idea è quella di combinare un protocollo "di consenso" con un protocollo di commit.\\
+In una rete in cui non si possono guastare più di F nodi si suddividono i nodi in tre categorie:
+\begin{itemize}
+\item un iniziatore
+\item 2F+1 accettanti
+\item e un certo numero di riceventi
+\end{itemize}
+Il TM è sostituito da un leader e altri 2F accettanti garantisce una decisione con N(F+3)-3 messaggi uguali (commit/rollback).
+\subsubsection{Interoperabilità del protocollo a due fasi: X-Open DTP}
+I protocolli appena visti permettono varie ottimizzazioni e soluzioni per le procedure di ripristino. Perciò sono stati implementati in diversi DBMS commerciali. Questo non permette però l'esecuzione di transizioni in sistemi eterogenei. Esiste perciò una versione standard del protocollo di commit a due fasi.\\
+Il protocollo \emph{X-Open DTP(Distributed Transiction Processing)} garantisce l'interoperabilità tra DBMS eterogenei. Il protocollo consta di due interfacce principali: l'interfaccia tra TM e client chiamata \emph{TM-interface} e l'interfaccia tra TM e RM chiamata \emph{XA-interface}.
+Le caratteristiche principali di questo standard sono:
+\begin{itemize}
+\item Gli RM sono totalmente passivi, tutto il controllo del protocollo è concentrato nel TM che attiva le funzioni degli RM.
+\item Il protocollo realizza un commit a due fasi con le ottimizzazioni di abort presunto e sola letture
+\item Il protocollo prevede decisioni euristiche che in presenza di guasti consentono l'evoluzione della transizione sotto il controllo dell'operatore.
+\end{itemize}
+La TM-interface consta delle seguenti procedure: 
+\begin{itemize}
+\item \textsf{tm\_init} e \textsf{tm\_exit} per iniziare e terminare il dialogo tra client e TM.
+\item \textsf{tm\_open} cui segue l'apertura di una sessione TM con i vari RM, la sessione viene chiusa a fronte di un \textsf{tm\_term}
+\item \textsf{tm\_begin} per iniziare una transizione
+\item \textsf{tm\_commit} per richiedere un commit globale.
+\end{itemize}
+La XA-interface invece è composta da:
+\begin{itemize}
+\item \textsf{xa\_open} e \textsf{xa\_close} per iniziare e concludere una sessione tra il TM e i vari RM.
+\item \textsf{xa\_start} e \textsf{xa\_end} per far partire una nuova transizione RM e per terminarla
+\item  \textsf{xa\_precom} per richiedere agli RM di svolgere la prima fase del protocollo.
+\item \textsf{xa\_commit} o \textsf{xa\_abort} per comunicare la decisione globale relativa alla transizione
+\item \textsf{xa\_recover} per iniziare una procedura di ripristino necessaria dopo la caduta di un processo.
+\end{itemize}
+\subsection{Parallelismo}
+Esistono due tipi di parallelismo il parallelismo \emph{intra-query} e quello \emph{inter-query}: 
+\begin{itemize}
+\item Il parallelismo si dice \emph{iter-query} quando si eseguono interrogazioni diverse in parallelo, nel quale si eseguono interrogazioni molto semplici ma con un frequenza assai elevata. Questo parallelismo è particolarmente efficente nel caso di sistemi OLTP.
+\item Il parallelismo si dice \emph{intra-query} quando si eseguono parti della stessa interrogazione in parallelo; il carico del DBMS in questo caso è sottoposto a poche interrogazioni ma molto complesse. Questo parallelismo è adatto a DBMS con funzionalità OLAP.
+\end{itemize}
+\subsection{Basi di dati replicate}
+Vedi slide del corso
