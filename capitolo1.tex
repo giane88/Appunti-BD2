@@ -1,143 +1,143 @@
 \label{capitolo1}
 \section{Gestione delle transizioni}
 \subsection{Le transizioni}
-Una transizione è un unità  elementare di lavoro svolta da un applicaazione; mentre un applicazione può essere formata da una serie di transizioni.\\
-Per meglio specificare una transizione è formata da una sequenza di operazioni racchiusa da una coppia di istruzioni che ne specificano l'inizio e la fine.
+Una transizione Ã¨ un unitÃ  elementare di lavoro svolta da un'applicazione; mentre un'applicazione puÃ² essere formata da una serie di transizioni.\\
+Per meglio specificare una transizione Ã¨ formata da una sequenza di operazioni racchiusa da una coppia di istruzioni che ne specificano l'inizio e la fine.
 In  particolare esistono 2 tipi di operazioni di fine transizione, il \emph{commit work} e il \emph{rollback work}; che richiedono rispettivamente una conclusione positiva e negativa della transizione.\\
 Una conclusione positiva della transizione implica una aggiornamento della base di dati; nel caso invece di un rollback i cambiamenti non vengono apportati alla base di dati.\\
-In caso di operazioni articolate è necessario introdurre il concetto di \emph{transizione ben formata} che prevede un inizio \textsf{start transiction} e una fine ideale \textsf{end transiction} nel corso della transizione viene eseguito uno solo dei comandi \textsf{commit} o \textsf{rollback} e in cui non avvengono operazioni sulla base di dati dopo l'esecuzzioni di uno di questi due comandi.
-\subsubsection{Proprietà  "acide" delle transizioni}
-Le transizioni, in quanto svolte in ambienti piuttosto critici, devono goderedi alcune proprietà  particolari dette \emph{acide}: atomicità , consistenza, isolamento e persistenza.
+In caso di operazioni articolate Ã¨ necessario introdurre il concetto di \emph{transizione ben formata} che prevede un inizio \textsf{start transiction} e una fine ideale \textsf{end transiction} nel corso della transizione viene eseguito uno solo dei comandi \textsf{commit} o \textsf{rollback} e in cui non avvengono operazioni sulla base di dati dopo l'esecuzioni di uno di questi due comandi.
+\subsubsection{ProprietÃ Â  "acide" delle transizioni}
+Le transizioni, in quanto svolte in ambienti piuttosto critici, devono godere di alcune proprietÃ Â  particolari dette \emph{acide}: atomicitÃ Â , consistenza, isolamento e persistenza.
 \begin{description}
-    \item[Atomicità ] rappresenta il fatto che una transizione è un'unità  \emph{indivisibile} di esecuzione; o viene eseguita e resa visibile l'intera transizione oppure non deve esserci nessun effetto sulla base di dati.
-Questo significa che nel caso di un guasto durante la transizione il sistema deve riportare la base di dati nel suo stato iniziale (\emph{undo}) mentre dopo l'essecuzione di un commit il sistema deve rieseguire le operazioni per applicare le modifiche (\emph{redo)}. Nel caso invece di un rollback il sistema uccide la transizione, questa operazione è detta di \emph{abort}.\\
-	\item[Consistenza] richiede che tutte le transizioni non violino i vincoli di integritÃ  definiti sulla base di dati. La verifica di questi vincoli è di tipo immediato gestendo nel programma le condizioni anomale e rimuovendone gli effetti.\\
-	\item[Isolamento] forse la più importante delle proprietà  acide richiede che l'esecuzione di una transizione sia indipendente dalla contemporanea esecuzione di altre transizioni; ovvero si richiede che il risultato di esecuzioni concorrenti sia uguale al risultato delle singole transizioni eseguite da sole.\\
-	\item[Persistenza] questa proprietà  richiede che l'effetto di una transizione che ha eseguito correttamente il commit non venga più perso.
+    \item[AtomicitÃ Â ] rappresenta il fatto che una transizione Ã¨ un'unitÃ Â  \emph{indivisibile} di esecuzione; o viene eseguita e resa visibile l'intera transizione oppure non deve esserci nessun effetto sulla base di dati.
+Questo significa che nel caso di un guasto durante la transizione il sistema deve riportare la base di dati nel suo stato iniziale (\emph{undo}) mentre dopo l'esecuzione di un commit il sistema deve rieseguire le operazioni per applicare le modifiche (\emph{redo)}. Nel caso invece di un rollback il sistema uccide la transizione, questa operazione Ã¨ detta di \emph{abort}.\\
+	\item[Consistenza] richiede che tutte le transizioni non violino i vincoli di integritÃ Â  definiti sulla base di dati. La verifica di questi vincoli Ã¨ di tipo immediato gestendo nel programma le condizioni anomale e rimuovendone gli effetti.\\
+	\item[Isolamento] forse la piÃ¹ importante delle proprietÃ Â  acide richiede che l'esecuzione di una transizione sia indipendente dalla contemporanea esecuzione di altre transizioni; ovvero si richiede che il risultato di esecuzioni concorrenti sia uguale al risultato delle singole transizioni eseguite da sole.\\
+	\item[Persistenza] questa proprietÃ Â  richiede che l'effetto di una transizione che ha eseguito correttamente il commit non venga piÃ¹ perso.
 \end{description}
 
 \subsection{Controllo di concorrenza}
-Un DBMS deve servire diverse applicazioni contemporaneamente e rispondere a richieste di diversi utenti. Per questo è necessario che le transizioni in un DBMS vengano eseguite concorrentemente.
+Un DBMS deve servire diverse applicazioni contemporaneamente e rispondere a richieste di diversi utenti. Per questo Ã¨ necessario che le transizioni in un DBMS vengano eseguite concorrentemente.
 \subsubsection{Anomalie delle transizioni concorrenti}
-L'esecuzione concorrente di varie transizioni può portare ad alcuni problemi di correttezza o anomalie.
-\paragraph{Perdita di aggiornamento} 
+L'esecuzione concorrente di varie transizioni puÃ² portare ad alcuni problemi di correttezza o anomalie.
+\paragraph{Perdita di aggiornamento}
 $$r_1(x),r_2(x),w_2(x),c_2,w_1(x),c_1$$
 In questo caso come si nota non si registrano gli effetti della transizione $t_2$ in quanto mascherata dalla prima transizione.
 \paragraph{Lettura sporca}
 $$r_1(x),w_1(x),r_2(x),a_1,c_2$$
-In questo caso la transizione $t_2$ va a leggere un dato che in realtà è errato in quanto la prima transizione dopo aver eseguito le operazioni esegue un \emph{abort}
+In questo caso la transizione $t_2$ va a leggere un dato che in realtÃ  Ã¨ errato in quanto la prima transizione dopo aver eseguito le operazioni esegue un \emph{abort}
 \paragraph{Lettura inconsistente}
 $$r_1(x),r_2(x),w_2(x),c_2,r_1(x)$$
-In questo caso la transizione $t_1$ legge due volte il dato \emph{x} che però è stato modificato da $t_2$; questo comportamento non è tollerato in quanto si vuole che una transizione che accede due volte alla base di dati trovi esattamente lo stesso valore.
-\paragraph{Aggiornamento fantasma} Prendiamo in considerazioni tre dati \emph{x, y, z} che soddisfano un vincolo di integrità  del tipo $x+y+z=1000$
+In questo caso la transizione $t_1$ legge due volte il dato \emph{x} che perÃ² Ã¨ stato modificato da $t_2$; questo comportamento non Ã¨ tollerato in quanto si vuole che una transizione che accede due volte alla base di dati trovi esattamente lo stesso valore.
+\paragraph{Aggiornamento fantasma} Prendiamo in considerazioni tre dati \emph{x, y, z} che soddisfano un vincolo di integritÃ Â  del tipo $x+y+z=1000$
 $$r_1(x),r_2(y),r_1(y),y-100,r_2(z),z+100,w_2(y),w_2(z),c_2,r_1(z),c_1$$
-In questo caso la transizione $t_1$ non rispetta più i vincoli di integrità  in quanto legge il valore di \emph{y} prima dell'update e quello di \emph{z} dopo.
+In questo caso la transizione $t_1$ non rispetta piÃ¹ i vincoli di integritÃ Â  in quanto legge il valore di \emph{y} prima dell'update e quello di \emph{z} dopo.
 \paragraph{Inserimento fantasma}
 \subsubsection{Teoria del controllo di concorrenza}
-Prima di definire la precisamente i problemi posti dalla concorrenza diamo alcune definizioni un po più rigorose.\\
+Prima di definire la precisamente i problemi posti dalla concorrenza diamo alcune definizioni un po piÃ¹ rigorose.\\
 Definiamo una transizione come una sequenza di operazioni di lettura o scrittura ad esempio:
 $$t_1: \ r_1(x),r_1(y),w_1(x),w_1(y)$$
-Uno \emph{schedule} è una sequenza di operazioni di ingresso/uscita presentate da trasinzioni concorrenti:
+Uno \emph{schedule} Ã¨ una sequenza di operazioni di ingresso/uscita presentate da transizioni concorrenti:
 $$S_1: \ r_1(x),r_2(z)w_1(x),w_2(z) \dots$$
 Le transizioni compaiono nello schedule seguendo l'ordine temporale con cui sono eseguite sulla base di dati.\\
-La funzione di un controllo di concorrenza è quella di accettare alcuni schedule e rifiutarne degli altri in modo da evitare che si verifichino le anomalie presentate in precedenza. 
-Il modulo che gestisce il controllo di concorrenza è perciò chiamato \emph{scheduler}.\\
-Innanzitutto ci occuperemo di schedule \emph{commit-proiezione} ovvero schedule nei quali l'esito delle trransizioni è noto e che contengono così solo le transizioni che producono un commit.\\
+La funzione di un controllo di concorrenza Ã¨ quella di accettare alcuni schedule e rifiutarne degli altri in modo da evitare che si verifichino le anomalie presentate in precedenza.
+Il modulo che gestisce il controllo di concorrenza Ã¨ perciÃ² chiamato \emph{scheduler}.\\
+Innanzitutto ci occuperemo di schedule \emph{commit-proiezione} ovvero schedule nei quali l'esito delle trransizioni Ã¨ noto e che contengono cosÃ¬ solo le transizioni che producono un commit.\\
 Definiamo \emph{seriale} uno schedule in cui le azioni di ciascuna transizione compaiono in sequenza senza essere frammentate da istruzioni di altre transizioni.
 $$S_2: \ r_0(x),r_0(y)w_0(x),r_1(y)r_1(x)w_1(y)r_2(x)r_2(y)r_2(z)w_2(z)$$
 
-L'esecuzione della commit-proiezione di uno schedule $S_i$ è corretta quando produce un risultato equivalente ad un qualunque schedule seriale $S_j$ con le stesse transizioni. In tal caso lo schedule $S_i$ si dice \emph{serializzabile}
-\paragraph{View-equivalenza} Prima di definere che cos'è la view-equivalenza definiamo alcune relazioni che legano coppie di operazioni di lettura e scrittura. Una lettura $r_i(x)$ \emph{legge da} una scrittura $w_j(x)$ quando $w_j(x)$ precede $r_i(x)$ e non vi è alcun $w_k(x)$ compresa tra le due.
-Una scrittura $w_i(x)$ viene detta \emph{scrittura finale} se è l'ultima scrittura sull'oggetto \emph{x}.\\
-Due schedule vengono detti \emph{view-equivalenti} ($S_i \approx_V S_j$) se possiedono le stesse relazioni \emph{legge-da} e le stesse \emph{scritture fianli}.
-Uno schedule è detto \emph{view-serializzabile} se esiste uno schedule seriale \emph{view-equivalente} ad esso.\\
-Determinare la view-equivalenza di uno schedule è un problema con complessità  lineare; ma determinare se uno schedule è view-equivalente a un qualisiasi schedule seriale è un problema NP-difficile. Questo risultato fa si che la view-equivalenza non sia utilizzabile per caratterizzare la serializzabilità  di uno schedule.
-\paragraph{Conflict-equivalenza} Date due azioni $a_i$ e $a_j$ con $i \neq j$ si dice che $a_i$ è in \emph{conflitto} con $a_j$ se esse operano sullo stesso oggetto e almeno una di essa è una scrittura.
-Possono perciò esistere conflitti lettura-scrittura (\emph{wr,rw}) oppure conflitti scrittura scrittura (\emph{ww}).\\
-Si dice che lo schedule $S_i$ è \emph{conflic-equivalente} allo schedule $S_j$ ($S_i \approx_C S_j$) se i due schedule presentano le stesse operazioni e ogni cocoppia di operazioni in conflitto è nello stesso ordine nei due schedule. Uno scschedule è \emph{conflict-serializzabile} se esiste uno schedule seriale a esso conflict-equivalente.\\
-LaLa classe degli schedule CSR è strettamente inclusa in quelli VSR esistono cioè, schedule che appartengono alla classe VSR ma non CSR.\\
-Il calcolo della conflict-serializzabilitÃ  è semplice, basta calcolare il \emph{grafo dei conflitti} costruito facendo corrispondere un nodo a ogni transizione e un arco orientato da $t_i$ a $t_j$ se esiste almeno un conflitto tra una azione $a_i$ e un'azione $a_j$. A questo punto si può dimostrare che uno schedule e CSR se e solo se il suo grafo dei conflitti è aciclico.\\
-Nonostante la fattibilità  del metodo CSR la sua implementazione in ambito commerciale risulta ancora troppo onerosa e inaccettabile.
-\paragraph{Locking a due fasi} Il meccanismo più diffuso per il controllo di concorrenza si basa sul \emph{locking}, un meccanismo molto semplice che impone che tutte le operazioni di lettura e scrittura siano protette attraverso l'esecuzione di opportune primitive \textsf{r\_lock, w\_lock, unlock}; lo scheduler (o in questo caso anche \emph{lock manager}) riceve una sequenza di richieste di esecuzione di queste primitive e ne verifica la correttezza semplicemente \emph{ispezionando} la struttura dati.\\
-Esistono alcuni vincoli da rispettare: 
+L'esecuzione della commit-proiezione di uno schedule $S_i$ Ã¨ corretta quando produce un risultato equivalente ad un qualunque schedule seriale $S_j$ con le stesse transizioni. In tal caso lo schedule $S_i$ si dice \emph{serializzabile}
+\paragraph{View-equivalenza} Prima di definire che cos'Ã¨ la view-equivalenza definiamo alcune relazioni che legano coppie di operazioni di lettura e scrittura. Una lettura $r_i(x)$ \emph{legge da} una scrittura $w_j(x)$ quando $w_j(x)$ precede $r_i(x)$ e non vi Ã¨ alcun $w_k(x)$ compresa tra le due.
+Una scrittura $w_i(x)$ viene detta \emph{scrittura finale} se Ã¨ l'ultima scrittura sull'oggetto \emph{x}.\\
+Due schedule vengono detti \emph{view-equivalenti} ($S_i \approx_V S_j$) se possiedono le stesse relazioni \emph{legge-da} e le stesse \emph{scritture finali}.
+Uno schedule Ã¨ detto \emph{view-serializzabile} se esiste uno schedule seriale \emph{view-equivalente} ad esso.\\
+Determinare la view-equivalenza di uno schedule Ã¨ un problema con complessitÃ Â  lineare; ma determinare se uno schedule Ã¨ view-equivalente a un qualsiasi schedule seriale Ã¨ un problema NP-difficile. Questo risultato fa si che la view-equivalenza non sia utilizzabile per caratterizzare la serializzabilitÃ Â  di uno schedule.
+\paragraph{Conflict-equivalenza} Date due azioni $a_i$ e $a_j$ con $i \neq j$ si dice che $a_i$ Ã¨ in \emph{conflitto} con $a_j$ se esse operano sullo stesso oggetto e almeno una di essa Ã¨ una scrittura.
+Possono perciÃ² esistere conflitti lettura-scrittura (\emph{wr,rw}) oppure conflitti scrittura scrittura (\emph{ww}).\\
+Si dice che lo schedule $S_i$ Ã¨ \emph{conflict-equivalente} allo schedule $S_j$ ($S_i \approx_C S_j$) se i due schedule presentano le stesse operazioni e ogni coppia di operazioni in conflitto Ã¨ nello stesso ordine nei due schedule. Uno schedule Ã¨ \emph{conflict-serializzabile} se esiste uno schedule seriale a esso conflict-equivalente.\\
+La classe degli schedule CSR Ã¨ strettamente inclusa in quelli VSR esistono cioÃ¨, schedule che appartengono alla classe VSR ma non CSR.\\
+Il calcolo della conflict-serializzabilitÃ Â  Ã¨ semplice, basta calcolare il \emph{grafo dei conflitti} costruito facendo corrispondere un nodo a ogni transizione e un arco orientato da $t_i$ a $t_j$ se esiste almeno un conflitto tra una azione $a_i$ e un'azione $a_j$. A questo punto si puÃ² dimostrare che uno schedule e CSR se e solo se il suo grafo dei conflitti Ã¨ aciclico.\\
+Nonostante la fattibilitÃ Â  del metodo CSR la sua implementazione in ambito commerciale risulta ancora troppo onerosa e inaccettabile.
+\paragraph{Locking a due fasi} Il meccanismo piÃ¹ diffuso per il controllo di concorrenza si basa sul \emph{locking}, un meccanismo molto semplice che impone che tutte le operazioni di lettura e scrittura siano protette attraverso l'esecuzione di opportune primitive \textsf{r\_lock, w\_lock, unlock}; lo scheduler (o in questo caso anche \emph{lock manager}) riceve una sequenza di richieste di esecuzione di queste primitive e ne verifica la correttezza semplicemente \emph{ispezionando} la struttura dati.\\
+Esistono alcuni vincoli da rispettare:
 \begin{enumerate}
-\item Ogni operazioni di lettura deve essere preceduta da un \textsf{r\textunderscore lock} e seguita da un \textsf{unlock}; in questo caso il lock si dice \emph{condiviso} perché su un dato possono essere attivivi più lock di questo tipo.
-\item Ogni operazione di scrittura deve essere preceduta da un \textsf{w\_lock} e seguita da \textsf{unlock} in questo caso il lock si dice \emph{esclusivo} in quanto non può coesistere con altri tipi di lock.
+\item Ogni operazioni di lettura deve essere preceduta da un \textsf{r\textunderscore lock} e seguita da un \textsf{unlock}; in questo caso il lock si dice \emph{condiviso} perchÃ© su un dato possono essere attivi piÃ¹ lock di questo tipo.
+\item Ogni operazione di scrittura deve essere preceduta da un \textsf{w\_lock} e seguita da \textsf{unlock} in questo caso il lock si dice \emph{esclusivo} in quanto non puÃ² coesistere con altri tipi di lock.
 \end{enumerate}
-Queste regole non sono strette perciò una transizione può richiedere un lock molto prima di effettuare tale operazione. Oppure potrebbe chiedere un \emph{lock upgrade} in caso debba compiere prima un'operazione di lettura e poi una di scrittura passando da un r\_lock a un w\_lock.\\
-I meccanismi di lock garantiscono che le transizioni che accedono alla base di dati operino in mutua esclusione; ma per avere la garanzia che queste seguano uno schedule serializzabile è necessario porre una restrizione sull'ordinamento delle richieste di lock, questo principio prende il nome di \emph{locking a due fasi} (2PL).\\
+Queste regole non sono strette perciÃ² una transizione puÃ² richiedere un lock molto prima di effettuare tale operazione. Oppure potrebbe chiedere un \emph{lock upgrade} in caso debba compiere prima un'operazione di lettura e poi una di scrittura passando da un r\_lock a un w\_lock.\\
+I meccanismi di lock garantiscono che le transizioni che accedono alla base di dati operino in mutua esclusione; ma per avere la garanzia che queste seguano uno schedule serializzabile Ã¨ necessario porre una restrizione sull'ordinamento delle richieste di lock, questo principio prende il nome di \emph{locking a due fasi} (2PL).\\
 \begin{center}
-\emph{Una transizione, dopo aver rilasciato un lock, non può acquisirne altri.}\\
+\emph{Una transizione, dopo aver rilasciato un lock, non puÃ² acquisirne altri.}\\
 \end{center}
-Utilizzzando questo principio si possono distinguere nell'esecuzione di una transizione due diverse fasi: una prima fase detta (\emph{crescente}) nella quale si acquisiscono i lock alle risorse alle quali bisogna accedere; una seconda fase (\emph{calante}) nella quale i lock acquisiti vengono rilasciati.\\
-La classe degli schedule 2PL è strettamente contenuta in quella CSR.\\
-Fino ad ora abbiamo lavorato immaginando che i nostri schedule non producessero mai un abort (commit-proiezione); ora possiamo estendere il meccanismo di locking a due fasi per fare in modo che anche quegli schedule con anomalie dovute agli abort delle transizioni (lettura sporca). Per rimuovere quindi la commit-proiezione restringiamo il protocollo 2PL, facendolo così diventare il così detto \emph{2PL strict}.\\
+Utilizzando questo principio si possono distinguere nell'esecuzione di una transizione due diverse fasi: una prima fase detta (\emph{crescente}) nella quale si acquisiscono i lock alle risorse alle quali bisogna accedere; una seconda fase (\emph{calante}) nella quale i lock acquisiti vengono rilasciati.\\
+La classe degli schedule 2PL Ã¨ strettamente contenuta in quella CSR.\\
+Fino ad ora abbiamo lavorato immaginando che i nostri schedule non producessero mai un abort (commit-proiezione); ora possiamo estendere il meccanismo di locking a due fasi per fare in modo che anche quegli schedule con anomalie dovute agli abort delle transizioni (lettura sporca). Per rimuovere quindi la commit-proiezione restringiamo il protocollo 2PL, facendolo cosÃ¬ diventare il cosÃ¬ detto \emph{2PL strict}.\\
 \begin{center}
 \emph{I locking di una transizione possono essere rilasciati solo dopo aver correttamente effettuato le operazioni di commit/abort.}\\
 \end{center}
-\paragraph{Controllo di concorrenza basato su timestamp} Questo meccanismo, più semplice ma meno efficace del locking a due fasi, utilizza i \emph{timestamp} cioè identificatori associati ad ogni evento temporale che definiscono un ordinamento totale sugli eventi. Il controllo di concorrenza avviene nel seguente modo:
+\paragraph{Controllo di concorrenza basato su timestamp} Questo meccanismo, piÃ¹ semplice ma meno efficace del locking a due fasi, utilizza i \emph{timestamp} cioÃ¨ identificatori associati ad ogni evento temporale che definiscono un ordinamento totale sugli eventi. Il controllo di concorrenza avviene nel seguente modo:
 \begin{itemize}
 \item a ogni transizione si associa un timestamp che presenta il momento di inizio della transizione;
 \item si accetta uno schedule solo se esso riflette l'ordinamento seriale delle transizioni in base al valore del timestamp di ciascuna transizione.
 \end{itemize}
-A ogni oggetto $x$ vengono associati due indicatori, WTM(x) e RTM(x) che indicano rispettivamente il timestamp più alto delle transizioni che hanno scritto e letto il dato $x$. Allo scheduler arrivano le richieste di accesso agli oggetti e queste vengono accettate o rifiutate secondo le seguenti regole:
+A ogni oggetto $x$ vengono associati due indicatori, WTM(x) e RTM(x) che indicano rispettivamente il timestamp piÃ¹ alto delle transizioni che hanno scritto e letto il dato $x$. Allo scheduler arrivano le richieste di accesso agli oggetti e queste vengono accettate o rifiutate secondo le seguenti regole:
 \begin{itemize}
-\item $r_t(x)$: se $t < WTM(X)$ la transizione viene uccisa, altrimenti la richiesta viene accettata e l'idicatore RTM(x) viene aggiornato con il massimo tra RTM(x) e $t$.
-\item $w_t(x)$: se $t < WTM(x) o t < RTM(x)$ la transizione viene uccisaaltrimenti la richiesta viene accettata e il valore di WTM(x) viene posto pari a $t$.
+\item $r_t(x)$: se $t < WTM(X)$ la transizione viene uccisa, altrimenti la richiesta viene accettata e l'indicatore RTM(x) viene aggiornato con il massimo tra RTM(x) e $t$.
+\item $w_t(x)$: se $t < WTM(x) o t < RTM(x)$ la transizione viene uccisa altrimenti la richiesta viene accettata e il valore di WTM(x) viene posto pari a $t$.
 \end{itemize}
-Il metodo TS comporta l'uccisione di un gran numero di transizioni ed è corretto solo se si bufferizzano le scritture e le si copiano sulla base di dati solo a commit avvenuto.\\
-Un metodo alternativo e più efficace consiste nel creare una copia ogni qualvolta una scrittura viene accettata; in questo caso le letture non vengono mai rifiutate ma vanno dirette alla copia del dato con il timestamp adeguato, mentre le scritture vengono accettate solo se il loro timestamp è maggiore di RTM(x) ed in tal caso si crea una nuova copia del dato.\\
+Il metodo TS comporta l'uccisione di un gran numero di transizioni ed Ã¨ corretto solo se si bufferizzano le scritture e le si copiano sulla base di dati solo a commit avvenuto.\\
+Un metodo alternativo e piÃ¹ efficace consiste nel creare una copia ogni qualvolta una scrittura viene accettata; in questo caso le letture non vengono mai rifiutate ma vanno dirette alla copia del dato con il timestamp adeguato, mentre le scritture vengono accettate solo se il loro timestamp Ã¨ maggiore di RTM(x) ed in tal caso si crea una nuova copia del dato.\\
 \subsubsection{Meccanismi per la gestione dei lock}
-Come abbiamo visto nel precedente paragrafo il lock è il meccanismo più diffuso per quanto riguarda i DB commerciali. Fino ad ora però abbiamo supposto che il lock bloccasse tutte le risorse.\\
-In realtà  esiste un meccanismo chiamato \emph{lock gerarchico} che permette una granularità  più fine sul lock delle risorse. Esso mette a disposizione un maggior numero di primitive:
+Come abbiamo visto nel precedente paragrafo il lock Ã¨ il meccanismo piÃ¹ diffuso per quanto riguarda i DB commerciali. Fino ad ora perÃ² abbiamo supposto che il lock bloccasse tutte le risorse.\\
+In realtÃ Â  esiste un meccanismo chiamato \emph{lock gerarchico} che permette una granularitÃ Â  piÃ¹ fine sul lock delle risorse. Esso mette a disposizione un maggior numero di primitive:
 \begin{itemize}
 \item XL: lock esclusivo, corrisponde al write-lock
 \item SL: lock condiviso, corrisponde al read-lock
 \item ISL: intenzione di lock condiviso, esprime l'intenzione di bloccare in modo condiviso uno dei sottonodi del nodo a cui si applica.
-\item IXL: intenzione di lock esclusivo, esprime la volontà di bloccare in modo esclusivo uno dei nodi figli.
+\item IXL: intenzione di lock esclusivo, esprime la volontÃ  di bloccare in modo esclusivo uno dei nodi figli.
 \item SIXL: lock condiviso con intenzione di lock esclusivo, blocca il nodo corrente in modo condiviso ma esprime l'intenzione di bloccare in modo esclusivo uno dei sottonodi.
 \end{itemize}
 \subsubsection{Blocco critico}
-Il blocco critico o \emph{deadlock} è una situazione nella quale due transizioni rimangono in attesa di acquisire un lock che richiederebbe la terminazione di una delle due transizioni per essere concesso.
-Esistono diversi meccanismi però per evitare che ciò accada:
+Il blocco critico o \emph{deadlock} Ã¨ una situazione nella quale due transizioni rimangono in attesa di acquisire un lock che richiederebbe la terminazione di una delle due transizioni per essere concesso.
+Esistono diversi meccanismi perÃ² per evitare che ciÃ² accada:
 \begin{enumerate}
 \item timeout
 \item prevenzione
 \item rilevamento
 \end{enumerate}
-\paragraph{Timeout} La tecnica più semplice che implica che le transizioni rimangano in attesa di una risorsa per un tempo prefissato, se passa questo tempo e la risorsa non è stata concessa allora la richiesta di lock viene negata e la transizione abortita.
-\paragraph{Prevenzione dei blocchi critici} Vi sono diverse tecniche per prevenire i deadlock; una è quella di richiedere i lock su tutte le risorse in una volta sola. Un'altro metodo si basa sul controllo dei timestamp e di concedere l'attesa di una risorsa solo se chi l'ha bloccata ha un timestamp maggiore.
-Questi meccanismi tendono però a non essere molto efficenti e perciò non vengono spesso implementato nei DBMS commericali.
-\paragraph{Rilevamento dei blocchi critici} Più comune è l'uso del rilevamento dei blocchi critici. Questo meccanismo viene implementato nel seguente modo; il gestore di concorrenza concede i lock alle varie transizioni salvando in una tabella l'identificativo della transizione e le risorse da essa bloccate.\\
+\paragraph{Timeout} La tecnica piÃ¹ semplice che implica che le transizioni rimangano in attesa di una risorsa per un tempo prefissato, se passa questo tempo e la risorsa non Ã¨ stata concessa allora la richiesta di lock viene negata e la transizione abortita.
+\paragraph{Prevenzione dei blocchi critici} Vi sono diverse tecniche per prevenire i deadlock; una Ã¨ quella di richiedere i lock su tutte le risorse in una volta sola. Un'altro metodo si basa sul controllo dei timestamp e di concedere l'attesa di una risorsa solo se chi l'ha bloccata ha un timestamp maggiore.
+Questi meccanismi tendono perÃ² a non essere molto efficienti e perciÃ² non vengono spesso implementato nei DBMS commerciali.
+\paragraph{Rilevamento dei blocchi critici} PiÃ¹ comune Ã¨ l'uso del rilevamento dei blocchi critici. Questo meccanismo viene implementato nel seguente modo; il gestore di concorrenza concede i lock alle varie transizioni salvando in una tabella l'identificativo della transizione e le risorse da essa bloccate.\\
 Periodicamente il controllore di concorrenza analizza la tabella dei lock e crea il grafico dei conflitti; una volta creato il grafico controlla se in esso sono presenti dei cicli.\\
-Questo meccanismo soprattutto quando eseguito periodicamente risulta molto efficente ed è  usato da molti vendor.
+Questo meccanismo soprattutto quando eseguito periodicamente risulta molto efficiente ed Ã¨  usato da molti vendor.
 
-\subsection{Controllo di affidabilità }
-Il controllo di affidabilità  garantisce \emph{l'atomicità } e la \emph{persistenza} delle transizioni; ovvero esso permette che le transizioni non vengano lasciate incomplete e che gli effetti di ciascuna transizione conclusa siano mantenuti in modo permanente.\\
-Il controllo di affidabilità  è svolto dal rispettivo controllore e viene implementato attraverso il \emph{log} sul quale vengono memorizzate tutte le azioni svolte dal DBMS (\emph{DataBase Management System}).
-\subsubsection{Architettura del controllore di affidabilità }
-Il controllore di affidabilitaà ha il compito di realizzare i comandi \textsf{start transiction, comit, rollback} e di realizzare le operazioni di ripristino dopo i malfunzionamenti dette \emph{ripresa a caldo} e \emph{ripresa a freddo} ed infine predisponei dati necessari per eseguire meccanismi di ripristino dai guasti in particolare azioni di \emph{checkpoint} e di \emph{dump}.
+\subsection{Controllo di affidabilitÃ Â }
+Il controllo di affidabilitÃ Â  garantisce \emph{l'atomicitÃ Â } e la \emph{persistenza} delle transizioni; ovvero esso permette che le transizioni non vengano lasciate incomplete e che gli effetti di ciascuna transizione conclusa siano mantenuti in modo permanente.\\
+Il controllo di affidabilitÃ Â  Ã¨ svolto dal rispettivo controllore e viene implementato attraverso il \emph{log} sul quale vengono memorizzate tutte le azioni svolte dal DBMS (\emph{DataBase Management System}).
+\subsubsection{Architettura del controllore di affidabilitÃ Â }
+Il controllore di affidabilitÃ  ha il compito di realizzare i comandi \textsf{start transiction, commit, rollback} e di realizzare le operazioni di ripristino dopo i malfunzionamenti dette \emph{ripresa a caldo} e \emph{ripresa a freddo} ed infine predispone dati necessari per eseguire meccanismi di ripristino dai guasti in particolare azioni di \emph{checkpoint} e di \emph{dump}.
 \subsubsection{Organizzazione del log}
-Il \emph{log} è un file sequenziale in sono contenute informazioni ridondante che permettono di ricostruire il contenuto della base di dati a seguito di guasti. Vengono registrate le azioni svolte dalle varie transizioni nell'ordine temporale delle stesse.\\
+Il \emph{log} Ã¨ un file sequenziale in sono contenute informazioni ridondante che permettono di ricostruire il contenuto della base di dati a seguito di guasti. Vengono registrate le azioni svolte dalle varie transizioni nell'ordine temporale delle stesse.\\
 I record del log sono di due tipi:
 \begin{itemize}
 \item di transizione
 \item di sistema
 \end{itemize}
-I record di transizione registrano le attività  svolte da ciascuna transizione nell'ordine in cui vengono effettuate; ovvero vengono inseriti i record di \textsf{begin} i vari record relativi alle azioni eseguite (\textsf{insert, delete, update})e uno dei due record \textsf{commit} oppure \textsf{abort}.\\
-I record nei log vengono così indicati:
+I record di transizione registrano le attivitÃ Â  svolte da ciascuna transizione nell'ordine in cui vengono effettuate; ovvero vengono inseriti i record di \textsf{begin} i vari record relativi alle azioni eseguite (\textsf{insert, delete, update})e uno dei due record \textsf{commit} oppure \textsf{abort}.\\
+I record nei log vengono cosÃ¬ indicati:
 \begin{itemize}
-\item I record di \textsf{begin, commit e abort} contengono oltre all'ndicazione del tipo di operazione anche un identificativo della transizione che viene eseguita (\emph{B($T_i$),C($T_i$),A($T_i$)})
+\item I record di \textsf{begin, commit e abort} contengono oltre all'indicazione del tipo di operazione anche un identificativo della transizione che viene eseguita (\emph{B($T_i$),C($T_i$),A($T_i$)})
 \item Il record \textsf{update} oltre all'identificativo della transizione contiene l'identificativo dell'oggetto sul quale si effettua l'operazione \emph{O} e lo stato prima e dopo la modifica indicati rispettivamente da \emph{BS (before state)} e \emph{BS (After state)}.
 \item I record \textsf{insert} e \textsf{delete} sono simili all'update solo che mancano dei campi rispettivamente di BS e AS.
 \end{itemize}
 L'utilizzo di questi record permette di disfare e rifare le azioni in caso di guasto; le azioni che svolgono questa funzione sono:
 \begin{itemize}
-\item Primitiva di \emph{Undo} che disfa le azioni su un oggetto O ricopiando in tale oggetto il valore BS mentre per l'insert si cancella semplicemente l'oggeto.
+\item Primitiva di \emph{Undo} che disfa le azioni su un oggetto O ricopiando in tale oggetto il valore BS mentre per l'insert si cancella semplicemente l'oggetto.
 \item Primitiva di \emph{Redo} che riesegue le operazioni su un oggetto O ricopiando il valore AS e nel caso di delete ricreando l'oggetto cancellato.
 \end{itemize}
 Per quanto riguarda i due record di sistema abbiamo il \emph{checkpoint} e il \emph{dump}.
-Il checkpoint è un operazione che viene svolta periodicamente con l'obiettivo di registrare quali transizioni sono attive. Una versione semplitificata ed intuitiva delle operazioni che vengono svolte è la seguente:
+Il checkpoint Ã¨ un operazione che viene svolta periodicamente con l'obiettivo di registrare quali transizioni sono attive. Una versione semplificata ed intuitiva delle operazioni che vengono svolte Ã¨ la seguente:
 \begin{enumerate}
 \item Si sospende l'accettazione di operazioni di scrittura, commit o abort da parte di qualunque transizione.
 \item Si trasferiscono in memoria di massa tutte le pagine del buffer.
@@ -145,32 +145,32 @@ Il checkpoint è un operazione che viene svolta periodicamente con l'obiettivo di
 \item Si riprende l'accettazione delle operazioni sospese.
 \end{enumerate}
 
-Un \emph{dump}, invece, è una copia completa della base di dati effettuata in muta esclusione con tutte le transizioni quando il sistema non è operativo.
+Un \emph{dump}, invece, Ã¨ una copia completa della base di dati effettuata in muta esclusione con tutte le transizioni quando il sistema non Ã¨ operativo.
 Dopo l'operazione di dump viene scritto il relativo record sul log.
 \subsubsection{Esecuzione delle transizioni e scrittura sul log}
-Per ripristinare la base di dati in caso di guasti è necessario che durante il normale svolgimento delle transizioni il controllore di affidabilità  garantisca due regole nella scrittura dl log:
+Per ripristinare la base di dati in caso di guasti Ã¨ necessario che durante il normale svolgimento delle transizioni il controllore di affidabilitÃ Â  garantisca due regole nella scrittura dl log:
 \begin{itemize}
-\item La regola \emph{WAL (Write Ahead Log)} impone che la parte \emph{before state} dei record di un log sia scritta sul log prima di effetuare la corrispondente operazione sulla base di dati. 
+\item La regola \emph{WAL (Write Ahead Log)} impone che la parte \emph{before state} dei record di un log sia scritta sul log prima di effettuare la corrispondente operazione sulla base di dati.
 \item La regola di \emph{Commit-Precedenza} impone che la parte \emph{after state} dei record venga scritta nel lo prima di effettuare il commit.
 \end{itemize}
-La transizione infine scrive in modo sincrono il record di commit; così facendo un eventuale guasto prima di questa operazione comporta l'\emph{Undo} di tale operazionem mentre un guasto dopo il record di commit implica l'esecuzione in caso di guasto della primitiva \emph{Redo}.
+La transizione infine scrive in modo sincrono il record di commit; cosÃ¬ facendo un eventuale guasto prima di questa operazione comporta l'\emph{Undo} di tale operazione mentre un guasto dopo il record di commit implica l'esecuzione in caso di guasto della primitiva \emph{Redo}.
 \subsubsection{Gestione dei guasti}
 Dal punto di vista di un DBMS i guasti si suddivido in due classi:
 \begin{itemize}
 \item \emph{Guasti di sistema:} sono guasti introdotti da problemi software oppure dovuti a malfunzionamenti dei dispositivi che portano il sistema in uno stato inconsistente. Questi portano ad una perdita dei dati in memoria centrale ma la memoria di massa rimane consistente.
-\item \emph{Guaasti del dispositivo:} sono guasti relativi ai dispositivi di memorizzazione di massa; in questo caso si ha una perdita totale della base di dati ma non del log.
+\item \emph{Guasti del dispositivo:} sono guasti relativi ai dispositivi di memorizzazione di massa; in questo caso si ha una perdita totale della base di dati ma non del log.
 \end{itemize}
-Il modello ideale nel quale noi ci poniamo è detto \emph{fail-stop} ovvero quando il sistema individua un guasto esso arresta tutte le transizioni e ripristina il corretto funzionamento del sistema. Nel caso di guasto di sistema si effetua una \emph{ripresa a caldo} mentre nel caso di guasto dispositivo si effettua una \emph{ripresa a freddo}
+Il modello ideale nel quale noi ci poniamo Ã¨ detto \emph{fail-stop} ovvero quando il sistema individua un guasto esso arresta tutte le transizioni e ripristina il corretto funzionamento del sistema. Nel caso di guasto di sistema si effettua una \emph{ripresa a caldo} mentre nel caso di guasto dispositivo si effettua una \emph{ripresa a freddo}
 \paragraph{Ripresa a caldo} La ripresa a caldo si articola nelle seguenti fasi:
 \begin{enumerate}
-\item Si accede all'ultimo record del log e si ripercorre all'indietro fino all'ultimo e più recente record di checkpoint.
-\item Si decidonmo le transizioni da rifare o disfare; si costruiscono due insiemi UNDO e REDO e si inizializza l'insieme di UNDO con le transizioni attive al momento del checkpoint. Inoltre si aggiungono a tale insieme tutte le transizioni che presentano nel log un record di \emph{begin} mentre si spostano nell'insieme REDO quelle che presentano il record di commit.
+\item Si accede all'ultimo record del log e si ripercorre all'indietro fino all'ultimo e piÃ¹ recente record di checkpoint.
+\item Si decidono le transizioni da rifare o disfare; si costruiscono due insiemi UNDO e REDO e si inizializza l'insieme di UNDO con le transizioni attive al momento del checkpoint. Inoltre si aggiungono a tale insieme tutte le transizioni che presentano nel log un record di \emph{begin} mentre si spostano nell'insieme REDO quelle che presentano il record di commit.
 \item Si ripercorre nuovamente all'indietro il log disfacendo quelle dell'insieme UNDO.
 \item Infine si rifanno le transizioni presenti nell'insieme REDO.
 \end{enumerate}
 \paragraph{Ripresa a freddo} La ripresa a freddo consiste in tre fasi:
 \begin{enumerate}
-\item Nella prima fase si accede al dump e si ricopia selettivamente la parte deteriorata della base di dati e si ritrova nel log il più recente record di \emph{dump}.
+\item Nella prima fase si accede al dump e si ricopia selettivamente la parte deteriorata della base di dati e si ritrova nel log il piÃ¹ recente record di \emph{dump}.
 \item Si ripercorre in avanti il log rieseguengo tutte le operazioni descritte in modo da riportarsi alla situazione precedente al guasto.
 \item Si esegue una ripresa a caldo.
 \end{enumerate}

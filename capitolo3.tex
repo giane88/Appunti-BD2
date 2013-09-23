@@ -1,29 +1,29 @@
 \label{capitolo3}
 \section{Architetture per l'analisi dei dati}
-La tecnologia delle basi di dati Ë finalizzata principalmente alla gestione efficente di dati in linea (OLTP). Tramite questa tecnologia le imprese accumulano grandi moli di dati relativi alla loro gestione. Questi dati possono rivelarsi utili per la pianificazione e il supporto alle decisioni.\\
-Per anni si Ë trascurato l'aspetto informativo dei dati supponendo che i meccanismi e i linguaggi utilizzati per il trattamento dei dati in linea fossero capaci di soddisfare le esigenze di analisi. Questo risulta in parte vero in quanto SQL Ë si un linguaggio adatto alla gestione e l'interrogazione di questi dati, ma risulta di difficile ottimizzazione, non adatto ad utenti no informatici ed inoltre Ë assai difficile ottimizzare un'applicazione affinche essa possa essere utilizzata sia per le transizioni in linea e per l'analisi dei dati.\\
+La tecnologia delle basi di dati √® finalizzata principalmente alla gestione efficente di dati in linea (OLTP). Tramite questa tecnologia le imprese accumulano grandi moli di dati relativi alla loro gestione. Questi dati possono rivelarsi utili per la pianificazione e il supporto alle decisioni.\\
+Per anni si √® trascurato l'aspetto informativo dei dati supponendo che i meccanismi e i linguaggi utilizzati per il trattamento dei dati in linea fossero capaci di soddisfare le esigenze di analisi. Questo risulta in parte vero in quanto SQL √® si un linguaggio adatto alla gestione e l'interrogazione di questi dati, ma risulta di difficile ottimizzazione, non adatto ad utenti no informatici ed inoltre √® assai difficile ottimizzare un'applicazione affinche essa possa essere utilizzata sia per le transizioni in linea e per l'analisi dei dati.\\
 Negli anni Novanta con l'avvento della tecnologia distribuita e lo sviluppo delle reti si sono evoluti specifiche architetture per l'analisi dei dati chiamate OLAP supportate da una specifica architettura la \emph{data warehouse} nella quale vengono raccolti tutti i dati.
 \subsection{Architettura di una data warehouse}
 Una data warehouse ha caratteristiche pe
 culiari che la distinguono dalle altre basi di dati:
 \begin{itemize}
-\item Ë una \emph{base di dati integrata}. I dati provengono da diverse sorgenti informative preesistenti.
-\item \emph{Contiene informazioni di caratter storico/temporale}. Mentre infatti le basi di dati OLTP mantengono il valore corrente delle informazioni nelle DW Ë contenuta tutta la cronologia dell'informazione.
-\item \emph{Contiene dati in forma aggregata}. Le principali attivit‡ di analisi si basano su informazioni ottenute aggregando i dati disponibili rispetto opportune coordinate.
-\item \emph{Ha un esistenza autonoma}. Il data warehouse Ë mantenuto fisicamente separato dalle sorgenti informative
-\item \emph{Ë una base di dati fuori linea}. I meccanismi di importazione dei dati sono di tipo asincrono e periodico.
+\item √® una \emph{base di dati integrata}. I dati provengono da diverse sorgenti informative preesistenti.
+\item \emph{Contiene informazioni di caratter storico/temporale}. Mentre infatti le basi di dati OLTP mantengono il valore corrente delle informazioni nelle DW √® contenuta tutta la cronologia dell'informazione.
+\item \emph{Contiene dati in forma aggregata}. Le principali attivit√† di analisi si basano su informazioni ottenute aggregando i dati disponibili rispetto opportune coordinate.
+\item \emph{Ha un esistenza autonoma}. Il data warehouse √® mantenuto fisicamente separato dalle sorgenti informative
+\item \emph{√® una base di dati fuori linea}. I meccanismi di importazione dei dati sono di tipo asincrono e periodico.
 \end{itemize}
 
-Un architettura adatta a soddisfare queste caratteristiche Ë composta dai seguenti componenti:
+Un architettura adatta a soddisfare queste caratteristiche √® composta dai seguenti componenti:
 \begin{itemize}
-\item Le \emph{sorgenti} dei dati o \emph{data source} I dati vengono estratti da uno o pi˘ sistemi preesistenti nel sistema informativo aziendale o da fonti esterne anche non gestito tramite DBMS.
-\item Il \emph{data warehouse server} Ë il sistema dedicato alla gestione della DW; memorizza i dati mediante opportune strutture fisiche  e realizza in modo efficente le integrazioni complesse. Permette operazioni speciali di \emph{roll up, drill down, data cube}. Molto spesso Ë formato da sottosistemi realizzati per specifiche esigenze detti \emph{data mart}
-\item Un \emph{sistema di alimentazione}. Consiste in una serie di strumenti ETL (\emph{Extract, Transform, Load}) che svolgono le seguenti attivit‡ di base:
+\item Le \emph{sorgenti} dei dati o \emph{data source} I dati vengono estratti da uno o pi√π sistemi preesistenti nel sistema informativo aziendale o da fonti esterne anche non gestito tramite DBMS.
+\item Il \emph{data warehouse server} √® il sistema dedicato alla gestione della DW; memorizza i dati mediante opportune strutture fisiche  e realizza in modo efficente le integrazioni complesse. Permette operazioni speciali di \emph{roll up, drill down, data cube}. Molto spesso √® formato da sottosistemi realizzati per specifiche esigenze detti \emph{data mart}
+\item Un \emph{sistema di alimentazione}. Consiste in una serie di strumenti ETL (\emph{Extract, Transform, Load}) che svolgono le seguenti attivit√† di base:
 \begin{itemize}
-\item L'\emph{estrazione} dei dati dalle sorgenti. Dopo il popolamento iniziale il processo di estrazione Ë tipicamente incrementale
+\item L'\emph{estrazione} dei dati dalle sorgenti. Dopo il popolamento iniziale il processo di estrazione √® tipicamente incrementale
 \item La \emph{pulizzia} dei dati che ha loscopo di analizzare la correttezza dei dati prima dell'inserimento nella data warehouse.
-\item La \emph{trasformazione} dei dati. Questo processo predispone i dati all'uso operativo svolgendo operazioni di riconciliazione delle eterogeneit‡ nelle varie sorgenti informative.
-\item Il \emph{caricamento} dei dati nella data warehouse. Questa operazione avviene quando il DW non Ë utilizzato e puÚ procedere accquisendo tutti i dati; oppure i dati vengono allineati in modo incrementale propagano le modifiche fatte sulla base di dati
+\item La \emph{trasformazione} dei dati. Questo processo predispone i dati all'uso operativo svolgendo operazioni di riconciliazione delle eterogeneit√† nelle varie sorgenti informative.
+\item Il \emph{caricamento} dei dati nella data warehouse. Questa operazione avviene quando il DW non √® utilizzato e pu√≤ procedere accquisendo tutti i dati; oppure i dati vengono allineati in modo incrementale propagano le modifiche fatte sulla base di dati
 \end{itemize}
 \item Alcuni strumenti di \emph{analisi} che consentono di effettuare analisi sui dati presenti nella DW e si distinguono in:
 \begin{itemize}
@@ -32,24 +32,24 @@ Un architettura adatta a soddisfare queste caratteristiche Ë composta dai seguen
 \end{itemize}
 \end{itemize}
 \subsection{Rappresentazine multidimensionale dei dati}
-Il modello multidimensionale dei dati Ë basato su tre concetti base: il fatto, la misura e la dimensione.\\
-Un \emph{fatto} Ë un concetto del sistema informativo sul quale ha senso svolgere un processo di analisi orientato al supporto di decisioni. Una \emph{misura} Ë invece una propriet‡ atomica di un fatto che intendiamo analizzare (un attributo numerico). Infine una \emph{dimensione} Ë una particolare prospettiva lungo la quale l'analisi di un fatto puÚ essere effettuata. I valori possibili di una dimensione sono detti \emph{membri}.\\
+Il modello multidimensionale dei dati √® basato su tre concetti base: il fatto, la misura e la dimensione.\\
+Un \emph{fatto} √® un concetto del sistema informativo sul quale ha senso svolgere un processo di analisi orientato al supporto di decisioni. Una \emph{misura} √® invece una propriet√† atomica di un fatto che intendiamo analizzare (un attributo numerico). Infine una \emph{dimensione} √® una particolare prospettiva lungo la quale l'analisi di un fatto pu√≤ essere effettuata. I valori possibili di una dimensione sono detti \emph{membri}.\\
 Di seguito un esempio schematico
 \begin{center}
 \begin{verbatim}
 fatto: Vendite;
-misure: quantit‡,incasso;
+misure: quantit√†,incasso;
 dimensione: articolo, periodo di tempo, luogo;
 \end{verbatim}
 \end{center}
 
-Le dimensioni vengono tipicamente organizzate in gerarchie di \emph{livelli di aggregazione} ad esempio la dimensione "luogo" potrebbe essere aggregata in "citt‡$\rightarrow$provincia$\rightarrow$regione".\\
+Le dimensioni vengono tipicamente organizzate in gerarchie di \emph{livelli di aggregazione} ad esempio la dimensione "luogo" potrebbe essere aggregata in "citt√†$\rightarrow$provincia$\rightarrow$regione".\\
 Un'\emph{istanza} di un fatto assegna ad ogni possibile combinazione di membri un valore per ciascuna misura del fatto.
 \subsubsection{Operazione nel modello multidimensionale}
-Le pi˘ note operazioni che si possono applicare al modello multidimensionale sono \emph{slice-and-dice, roll-up} e il \emph{drill-down}.\\
-L'operazione di \emph{slice-and-dice} consiste nella semplice selezione di un sottoinsieme di membri; ad esempio le vendite di un certo tipo di prodotto in una citt‡ o negozio precisi.\\
+Le pi√π note operazioni che si possono applicare al modello multidimensionale sono \emph{slice-and-dice, roll-up} e il \emph{drill-down}.\\
+L'operazione di \emph{slice-and-dice} consiste nella semplice selezione di un sottoinsieme di membri; ad esempio le vendite di un certo tipo di prodotto in una citt√† o negozio precisi.\\
 L'operazione di \emph{roll-up} consiste in un aggregazione dei dati di un cubo seguita dall'applicazione di una funzione aggregativa. Esistono due tipologie di aggregazione, la prima consiste nel salire di livello in una gerarchia, oppure si elimina un'intera dimensione del cubo e aggregando lungo la dimensione eliminata.\\
-Il \emph{drill-down} Ë l'operazione inversa del roll-up consiste cioË nell'aggiungere dettaglio alle dimensioni presenti scendendo nella gerarchia delle dimensioni.
+Il \emph{drill-down} √® l'operazione inversa del roll-up consiste cio√® nell'aggiungere dettaglio alle dimensioni presenti scendendo nella gerarchia delle dimensioni.
 \subsection{Realizzazione di uan data warehouse}
 Per realizzare una data warehouse esistono due soluzioni alternative:
 \begin{itemize}
@@ -58,11 +58,11 @@ Per realizzare una data warehouse esistono due soluzioni alternative:
 \end{itemize}
 \subsubsection{Rappresentazione relazionale di una data warehouse}
 In una relazione ROLAP i dati di un fatto multidimesionale sono organizzati secondo una semplice struttura relazionale detto \emph{schema a stella}.
-Lo schema a stella ha una struttura molto semplice ed Ë composta da:
+Lo schema a stella ha una struttura molto semplice ed √® composta da:
 \begin{itemize}
 \item una relazione principale detta \emph{tabella dei fatti} che memorizza le istanzze di un fatto.
 \item varie relazioni ausiliarie chiamate \emph{tabelle delle dimensioni} che memorizzano i membri delle dimensioni associate ad un fatto
-\item un insieme di vincoli di integrit‡ referenziale ognuno dei quali collega un attributo della tabella dei fatti a una tabella delle dimensioni.
+\item un insieme di vincoli di integrit√† referenziale ognuno dei quali collega un attributo della tabella dei fatti a una tabella delle dimensioni.
 \end{itemize}
 Esistono alcune caratteristiche distinguibili in tuttti gli schemi a stella, distinguiamo quelle che riguardano la tabella dei fatti e quelle che riguardano quelle dimensione.
 \begin{itemize}
@@ -75,7 +75,7 @@ Esistono alcune caratteristiche distinguibili in tuttti gli schemi a stella, dis
 \item Tabella delle dimensioni.
 	\begin{itemize}
 \item hanno una chiave semplice;
-\item gli attributi rappresentano i livelli di una dimensione o qualche loro propriet‡;
+\item gli attributi rappresentano i livelli di una dimensione o qualche loro propriet√†;
 \item sono generalmente \emph{denormalizzate}.
 	\end{itemize}
 \end{itemize}
@@ -83,24 +83,24 @@ Esistono alcune caratteristiche distinguibili in tuttti gli schemi a stella, dis
 La progettazione di una data warehouse prevede l'esecuzione di quattro fasi principali ognuna delle quali suddivisa in sotto-fasi.
 \paragraph{Dati di ingresso} Lo svolgimento della metodologia richiede la specifica di informazioni di ingresso e gli schemi delle sorgenti informative. I requisiti sono una descrizione delle esigenze aziendali di analisi.\\
 Gli schemi descrivono la struttura delle basi di dati disponibili con la relativa documentazione di supporto.
-\paragraph{Analisi dei dati di ingresso} La prima fase consiste in un'analisi dei dati a disposizione basati sulla correlazione tra requisiti e sorgenti informative al fine di individuare le sorgenti pi˘ adatte e le loro propriet‡.
-Il prodotto finale della fase di analisi Ë costituito da uno schema concettuale per ciascuna sorgente informativa selezionata corredato dall'opportuna documentazione di supporto.
-\paragraph{Integrazione} Questa fase consiste nella fusione dei dati presenti nelle varie sorgenti in un'unica base di dati globale che fornisce una visione unificata dell'intero patrimonio informativo aziendale. L'approccio Ë orientato alla risoluzione dei conflitti esistenti nei vari schemi tra rappresentazioni diverse degli stessi concetti.
+\paragraph{Analisi dei dati di ingresso} La prima fase consiste in un'analisi dei dati a disposizione basati sulla correlazione tra requisiti e sorgenti informative al fine di individuare le sorgenti pi√π adatte e le loro propriet√†.
+Il prodotto finale della fase di analisi √® costituito da uno schema concettuale per ciascuna sorgente informativa selezionata corredato dall'opportuna documentazione di supporto.
+\paragraph{Integrazione} Questa fase consiste nella fusione dei dati presenti nelle varie sorgenti in un'unica base di dati globale che fornisce una visione unificata dell'intero patrimonio informativo aziendale. L'approccio √® orientato alla risoluzione dei conflitti esistenti nei vari schemi tra rappresentazioni diverse degli stessi concetti.
 \paragraph{Progettazione della Data Warehouse} Questa fase prevede l'effettivo progetto della DW; si possono seguire due strade: la prima definita \emph{top-down} e la seconda chiamata \emph{bottom-up}.\\
-Nella prima si sviluppa la DW azziendale e poi da essa si ricavano i vari \emph{data mart}; nella seconda invece si parte dalla realizzazione dei data mart e il data warehouse si ottiene in maniera incrementale. L'approccio pi˘ diffuso Ë quello bottom-up in quanto implica uno sforzo e un costo di realizzazione ridotto.\\
-Prima di tutto si stabiliscono alcune dimensioni di riferimento che possono essere utili per l'analisi. Si puÚ procedere poi a una progettazione a livello concettuale e poi a livello logico traducendo lo schema concettuale in uno schema che dipende dalla tecnologia scelta. Lo schema concettuale perÚ parte, a differenza della progettazione di una base di dati classica, dallo schema ottenuto in fase di integrazione.\\
-Dallo schema di integrazione si ricavano i fatti interessanti per l'analisi che possono essere un insieme di aspetti oppure un'entit‡ a se stante.
-A questo punto si procede individuando le dimensioni dei fatti individuati. A questo punto si passa ad una ristrutturazione delle schema E-R nel quale i fatti corrispondono, nella maggior parte dei casi ad entit‡. Inoltre all'interno di una dimensione Ë molto utile rappresentare esplicitamente i vari livelli di aggregazione.\\
-A questo punto si puÚ procedere con la progettazione logica e ragionare in termini di sistema che si Ë deciso di adottare (ROLAP o MOLAP).\\
+Nella prima si sviluppa la DW azziendale e poi da essa si ricavano i vari \emph{data mart}; nella seconda invece si parte dalla realizzazione dei data mart e il data warehouse si ottiene in maniera incrementale. L'approccio pi√π diffuso √® quello bottom-up in quanto implica uno sforzo e un costo di realizzazione ridotto.\\
+Prima di tutto si stabiliscono alcune dimensioni di riferimento che possono essere utili per l'analisi. Si pu√≤ procedere poi a una progettazione a livello concettuale e poi a livello logico traducendo lo schema concettuale in uno schema che dipende dalla tecnologia scelta. Lo schema concettuale per√≤ parte, a differenza della progettazione di una base di dati classica, dallo schema ottenuto in fase di integrazione.\\
+Dallo schema di integrazione si ricavano i fatti interessanti per l'analisi che possono essere un insieme di aspetti oppure un'entit√† a se stante.
+A questo punto si procede individuando le dimensioni dei fatti individuati. A questo punto si passa ad una ristrutturazione delle schema E-R nel quale i fatti corrispondono, nella maggior parte dei casi ad entit√†. Inoltre all'interno di una dimensione √® molto utile rappresentare esplicitamente i vari livelli di aggregazione.\\
+A questo punto si pu√≤ procedere con la progettazione logica e ragionare in termini di sistema che si √® deciso di adottare (ROLAP o MOLAP).\\
 Alla fine si completa con la progettazione fisica della DW nella quale si definiscono le strutture disiche di accesso con i relativi parametri.
 \subsection{Data mining}
 Il termine \emph{data mining} viene utilizzato per indicare tecniche di analisi volte ad estrarre informazioni dai dati che non si otterrebbero con i metodi classici di analisi.
 \subsubsection{Il processo data mining}
 Il processo di data mining viene anche detto \emph{knowledge discovery on database (KDD)} e ha come obiettivo l'estrazione di informazioni che siano: valide con un certo grado di incertezza, precedentemente sconosciute, potenzialmente utili al supporto di decisioni.\\
-Il processo opera sui dati applicando opportuni algoritmi ed Ë in grado di restituire espressioni che descrivono in maniera sintetica e comprensibile le informazioni estratte. Queste espressioni vengono chiamate \emph{pattern}.
+Il processo opera sui dati applicando opportuni algoritmi ed √® in grado di restituire espressioni che descrivono in maniera sintetica e comprensibile le informazioni estratte. Queste espressioni vengono chiamate \emph{pattern}.
 Il processo di datamining procede in maniera iterativa seguendo queste fasi:
 \begin{enumerate}
-\item \emph{Comprensione del dominio.} Ë impossibile estrarre informazioni utili se non si sviluppa una buona comprensione del dominio nel quale si opera.
+\item \emph{Comprensione del dominio.} √® impossibile estrarre informazioni utili se non si sviluppa una buona comprensione del dominio nel quale si opera.
 \item \emph{Preparazione del set di dati}. Richiede l'individuazione dei dati sui quali applicare il processo di data mining.
 \item \emph{Scoperta dei pattern.} Consiste nell'applicazione del processo di data mining al set di dati in modo da estrarre pattern dai dati.
 \item \emph{Valutazione dei pattern}. Consiste nel trarre implicazioni applicative dai pattern scoperti.
@@ -109,12 +109,12 @@ Il processo di datamining procede in maniera iterativa seguendo queste fasi:
 \subsubsection{Problemi di data mining} 
 Anche se ogni applicazione presenta problemi specifici esistono alcune classi di problemi che si ripresentano ad agni applicazione.
 \paragraph{Regole di associazione} Le regole di associazione si applicano a datti descritti mediante una tabella relazionale partizionata tramite clausula di raggruppamento.\\ 
-Pi˘ precisamente una regola di associazione consta di una premessa e una conseguenza e ha la forma $premessa\rightarrow conseguenza$.
-E\' possibile definire in modo preciso le probabilit‡ relative alle regole di associazione. Si usano a tale scopo:
+Pi√π precisamente una regola di associazione consta di una premessa e una conseguenza e ha la forma $premessa\rightarrow conseguenza$.
+E\' possibile definire in modo preciso le probabilit√† relative alle regole di associazione. Si usano a tale scopo:
 \begin{itemize}
-\item il \emph{supporto} ovvero la probabilit‡ che in una transizione siano presenti sia la premessa che la conseguenza.
-\item la \emph{confidenza} che Ë la probabilit‡ che in una transizione in cui Ë presente la premessa sia presente anche la conseguenza.
+\item il \emph{supporto} ovvero la probabilit√† che in una transizione siano presenti sia la premessa che la conseguenza.
+\item la \emph{confidenza} che √® la probabilit√† che in una transizione in cui √® presente la premessa sia presente anche la conseguenza.
 \end{itemize}
-Il supporto misura l'importanza di una regola mentre la confidenza ne misura l'affidabilit‡.
-\paragraph{Classificazione} La classificazione mira alla catologazione di un fenomeno in un insieme di classi predefinite. Il \emph{classificatore} Ë un algoritmo che svolge la classificazione; viene costruito automaticamente partendo da un insieme di dati di prova e viene poi applicato per la classificazione di fenomeni generici; essi si presentano classicamente come alberi di decisione dove i nodi sono associati dei predicati che consentono di prendere decisioni sulla base di valori presenti nella tupla.
-\paragraph{Clustering} L'obbiettivo del clustering Ë quello di suddividere i dati in gruppi omogenei detti \emph{cluster} in modo che i dati appartenenti allo stesso gruppo presentino attributi simili. In questo caso non abbiamo nessuna conoscenza pregressa sulle aggregazioni possibili. I cluster ottenuti possono essere sovrapposti e ordinati gerarchicamente.
+Il supporto misura l'importanza di una regola mentre la confidenza ne misura l'affidabilit√†.
+\paragraph{Classificazione} La classificazione mira alla catologazione di un fenomeno in un insieme di classi predefinite. Il \emph{classificatore} √® un algoritmo che svolge la classificazione; viene costruito automaticamente partendo da un insieme di dati di prova e viene poi applicato per la classificazione di fenomeni generici; essi si presentano classicamente come alberi di decisione dove i nodi sono associati dei predicati che consentono di prendere decisioni sulla base di valori presenti nella tupla.
+\paragraph{Clustering} L'obbiettivo del clustering √® quello di suddividere i dati in gruppi omogenei detti \emph{cluster} in modo che i dati appartenenti allo stesso gruppo presentino attributi simili. In questo caso non abbiamo nessuna conoscenza pregressa sulle aggregazioni possibili. I cluster ottenuti possono essere sovrapposti e ordinati gerarchicamente.
